@@ -40,38 +40,11 @@ Ce projet fait partie de la mission **DATA NEXT**, pour tester la faisabilité e
 - **Redis (optionnel)** → Cache backend pour accès rapide  
 
 ### Diagramme d’architecture (ASCII)
+<img width="1536" height="1024" alt="image" src="https://github.com/user-attachments/assets/3e257b0e-d22a-49d6-89c0-909b29edea5f" />
 
-```text
-         +-------------------+        +-----------------+
-         | Binance WebSocket |        |     NewsAPI     |
-         +--------+----------+        +--------+--------+
-                  |                            |
-                  v                            v
-          +-------+----------------------------+------+
-          |    Spark Structured Streaming (Databricks) |
-          |  - Stream-to-Stream Join ±5 min            |
-          |  - Watermark / Fenêtres 1min / 5min       |
-          +------------+------------+-----------------+
-                       |            |
-         +-------------+            +-------------+
-         |                                          |
-+--------v--------+                       +---------v--------+
-| Delta Lake RAW  |                       | Supabase Table   |
-| & Enriched      |                       | market_enriched |
-+-----------------+                       +-----------------+
-         |
-         v
-   +-----+------+
-   | Kafka Topic|
-   | alerts_topic|
-   +-----+------+
-         |
-         v
-      [Redis Cache] (optionnel)
+### Étape 4 — Databricks (Streaming + Join)
 
-Étape 4 — Databricks (Streaming + Join)
-
-Configuration Spark Structured Streaming avec Kafka :
+**Configuration Spark Structured Streaming avec Kafka :
 
 CONFLUENT_BOOTSTRAP = "pkc-921jm.us-east-2.aws.confluent.cloud:9092"
 CONFLUENT_API_KEY   = "JWVBQ7RG25AVCHHY"
@@ -85,13 +58,13 @@ Multi-sink : Delta Lake, Supabase, Kafka alerts_topic
 
 🔗 Lien Databricks Notebook
 
-🔹 Étape 5 — Supabase (Warehouse Layer)
+### Étape 5 — Supabase (Warehouse Layer)
 
 Installation package Python :
 
 %pip install supabase
 
-Configuration :
+**Configuration :
 
 SUPABASE_URL = "https://TON_PROJECT_ID.supabase.co"
 SUPABASE_KEY = "TON_ANON_PUBLIC_KEY"
@@ -101,13 +74,13 @@ Création de la table : market_enriched
 
 Écriture des batch et stream Spark vers Supabase via foreachBatch
 
-🔹 Étape 6 — Data Lake
+### Étape 6 — Data Lake
 
 RAW : /home/hajar_mamdouh/data_lake/raw/fred/
 
 Enriched : /Volumes/invistis/datalake/raw/enriched
 
-🔹 Étape 7 — Validation & Schema
+### Étape 7 — Validation & Schema
 
 Schéma Kafka pour trades et news défini avec StructType
 
@@ -115,7 +88,7 @@ Vérification des valeurs nulles, types numériques et timestamps
 
 Test de la jointure stream-to-stream et batch → OK
 
-6️⃣ Résultats
+### Résultats
 
 Kafka topics créés et fonctionnels
 
@@ -127,10 +100,11 @@ Airflow DAG pour FRED fonctionnel
 
 Schémas validés et data flow opérationnel
 
-7️⃣ Liens utiles
+### Liens utiles
 
 Confluent Cloud :  
 https://confluent.cloud/environments/env-dz5wx1/clusters/lkc-y76m1j/overview?granularity=PT1M&interval=3600000&label=Last%20hour&refresh=60000
 
 Databricks Notebook :  
 https://dbc-679742dc-7a67.cloud.databricks.com/editor/notebooks/426871642664109?o=7474646532280705
+
